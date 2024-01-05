@@ -5,6 +5,7 @@ import 'package:bdd_widget_test/src/step_file.dart';
 import 'package:bdd_widget_test/src/step_generator.dart';
 import 'package:bdd_widget_test/src/util/common.dart';
 import 'package:bdd_widget_test/src/util/constants.dart';
+import 'package:dart_style/dart_style.dart';
 
 String generateFeatureDart(
   List<BddLine> lines,
@@ -93,7 +94,11 @@ String generateFeatureDart(
     );
   }
   sb.writeln('}');
-  return sb.toString();
+
+  final dartFmt = DartFormatter(
+    fixes: StyleFix.all,
+  );
+  return dartFmt.format(sb.toString());
 }
 
 bool _parseBackground(
