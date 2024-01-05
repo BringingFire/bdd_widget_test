@@ -13,8 +13,11 @@ String generateFeatureDart(
   String testMethodName,
   String testerType,
   String testerName,
-  bool isIntegrationTest,
-) {
+  bool isIntegrationTest, {
+  bool skipBindingInitialization = false,
+  List<String> additionalImports = const [],
+  List<String> additionalContext = const [],
+}) {
   final sb = StringBuffer();
   sb.writeln('// GENERATED CODE - DO NOT MODIFY BY HAND');
   sb.writeln('// ignore_for_file: unused_import, directives_ordering');
@@ -51,18 +54,31 @@ String generateFeatureDart(
   }
   sb.writeln("import 'package:flutter/material.dart';");
   sb.writeln("import 'package:flutter_test/flutter_test.dart';");
+  sb.writeln("import 'package:convenient_test/convenient_test.dart';");
+  sb.writeln("import 'package:convenient_test_dev/convenient_test_dev.dart';");
   if (isIntegrationTest) {
     sb.writeln("import 'package:integration_test/integration_test.dart';");
   }
-
   sb.writeln();
+
+  if (additionalImports.isNotEmpty) {
+    for (final imp in additionalImports) {
+      sb.writeln("import '$imp';");
+    }
+    sb.writeln();
+  }
+
   for (final step in steps.map((e) => e.import).toSet()) {
     sb.writeln("import '$step';");
   }
-
   sb.writeln();
+
   sb.writeln('void main() {');
-  if (isIntegrationTest) {
+  for (final ctx in additionalContext) {
+    sb.writeln(ctx);
+  }
+
+  if (isIntegrationTest && !skipBindingInitialization) {
     sb.writeln('  IntegrationTestWidgetsFlutterBinding.ensureInitialized();');
     sb.writeln();
   }
@@ -93,6 +109,7 @@ String generateFeatureDart(
       testerNameOverride,
     );
   }
+  sb.writeln('});' * additionalContext.length);
   sb.writeln('}');
 
   final dartFmt = DartFormatter(

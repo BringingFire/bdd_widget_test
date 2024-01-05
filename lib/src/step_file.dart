@@ -45,6 +45,28 @@ abstract class StepFile {
       );
     }
 
+    if (generatorOptions.stepFolder.startsWith('/')) {
+      final relativeStepDir = p.relative(
+        generatorOptions.stepFolder.substring(1),
+        from: featureDir,
+      );
+      final import = p
+          .join(
+            relativeStepDir,
+            file,
+          )
+          .replaceAll(r'\', '/');
+      final filename = p.join(generatorOptions.stepFolder.substring(1), file);
+      return NewStepFile._(
+        import,
+        filename,
+        package,
+        line,
+        testerTypeTagValue,
+        testerNameTagValue,
+      );
+    }
+
     final pathToTestFolder = p.relative(testFolderName, from: featureDir);
     final import = p
         .join(pathToTestFolder, generatorOptions.stepFolder, file)

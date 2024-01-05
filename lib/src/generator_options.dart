@@ -15,6 +15,9 @@ class GeneratorOptions {
     String? testerType,
     String? testerName,
     this.include,
+    this.additionalImports = const [],
+    this.additionalContext = const [],
+    this.skipBindingInitialization = false,
   })  : stepFolder = stepFolderName ?? _stepFolderName,
         testMethodName = testMethodName ?? _defaultTestMethodName,
         testerType = testerType ?? _defaultTesterType,
@@ -28,9 +31,17 @@ class GeneratorOptions {
         testerName: json['testerName'] as String?,
         externalSteps: (json['externalSteps'] as List?)?.cast<String>(),
         stepFolderName: json['stepFolderName'] as String?,
-        include: json['include'] is String
-            ? [(json['include'] as String)]
-            : (json['include'] as List?)?.cast<String>(),
+        include: switch (json['include']) {
+          final String str => [str],
+          final List<dynamic> list => list.cast<String>(),
+          null => null,
+          _ => throw UnimplementedError(),
+        },
+        additionalImports:
+            (json['additionalImports'] as List?)?.cast<String>() ?? [],
+        additionalContext:
+            (json['additionalContext'] as List?)?.cast<String>() ?? [],
+        skipBindingInitialization: json['skipBindingInitialization'] == true,
       );
 
   final String stepFolder;
@@ -39,6 +50,9 @@ class GeneratorOptions {
   final String testerName;
   final List<String>? include;
   final List<String> externalSteps;
+  final List<String> additionalImports;
+  final List<String> additionalContext;
+  final bool skipBindingInitialization;
 }
 
 Future<GeneratorOptions> flattenOptions(GeneratorOptions options) async {

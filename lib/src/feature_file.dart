@@ -4,6 +4,7 @@ import 'package:bdd_widget_test/src/generator_options.dart';
 import 'package:bdd_widget_test/src/step_file.dart';
 import 'package:bdd_widget_test/src/util/common.dart';
 import 'package:bdd_widget_test/src/util/constants.dart';
+import 'package:path/path.dart' as p;
 
 class FeatureFile {
   FeatureFile({
@@ -55,14 +56,26 @@ class FeatureFile {
   final Map<String, String> existingSteps;
   final GeneratorOptions generatorOptions;
 
-  String get dartContent => generateFeatureDart(
-        _lines,
-        getStepFiles(),
-        generatorOptions.testMethodName,
-        _testerType,
-        _testerName,
-        isIntegrationTest,
-      );
+  String get dartContent {
+    final additionalImportsRelative =
+        generatorOptions.additionalImports.map((i) {
+      if (i.startsWith('/')) {
+        return p.relative(i.substring(1), from: featureDir);
+      }
+      return i;
+    }).toList();
+    return generateFeatureDart(
+      _lines,
+      getStepFiles(),
+      generatorOptions.testMethodName,
+      _testerType,
+      _testerName,
+      isIntegrationTest,
+      skipBindingInitialization: generatorOptions.skipBindingInitialization,
+      additionalImports: additionalImportsRelative,
+      additionalContext: generatorOptions.additionalContext,
+    );
+  }
 
   List<StepFile> getStepFiles() => _stepFiles;
 
