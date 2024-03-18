@@ -60,7 +60,7 @@ String generateFeatureDart(
 
   if (additionalImports.isNotEmpty) {
     for (final imp in additionalImports) {
-      sb.writeln("import '$imp';");
+      sb.writeln("import '${imp.replaceAll(r'\', '/')}';");
     }
     sb.writeln();
   }
